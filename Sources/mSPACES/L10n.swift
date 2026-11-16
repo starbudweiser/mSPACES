@@ -17,6 +17,7 @@ private let strings: [String: [String: String]] = [
         "about.tagline": "Organisez les icônes de votre barre des menus en groupes grâce à des séparateurs.",
         "about.help": "Cliquez sur un séparateur et choisissez « Nouveau séparateur » pour en ajouter un. Pour en déplacer un, maintenez Cmd et faites-le glisser.",
         "about.version": "Version %@",
+        "about.collection": "Fait partie du DESKTOP MAC TOOLKIT",
     ],
     "en": [
         "upd.check": "Check for Updates…",
@@ -33,6 +34,7 @@ private let strings: [String: [String: String]] = [
         "about.tagline": "Organize your menu bar items into groups with separators.",
         "about.help": "Click a separator and choose “New Separator” to add another one. To move a separator, hold Command and drag it.",
         "about.version": "Version %@",
+        "about.collection": "Part of the DESKTOP MAC TOOLKIT",
     ],
     "es": [
         "upd.check": "Buscar actualizaciones…",
@@ -49,6 +51,7 @@ private let strings: [String: [String: String]] = [
         "about.tagline": "Organice los iconos de su barra de menús en grupos con separadores.",
         "about.help": "Haga clic en un separador y elija «Nuevo separador» para añadir otro. Para moverlo, mantenga Cmd y arrástrelo.",
         "about.version": "Versión %@",
+        "about.collection": "Forma parte del DESKTOP MAC TOOLKIT",
     ],
     "it": [
         "upd.check": "Cerca aggiornamenti…",
@@ -65,6 +68,7 @@ private let strings: [String: [String: String]] = [
         "about.tagline": "Organizza le icone della barra dei menu in gruppi con dei separatori.",
         "about.help": "Fai clic su un separatore e scegli «Nuovo separatore» per aggiungerne un altro. Per spostarlo, tieni premuto Cmd e trascinalo.",
         "about.version": "Versione %@",
+        "about.collection": "Fa parte del DESKTOP MAC TOOLKIT",
     ],
 ]
 

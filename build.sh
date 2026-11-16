@@ -2,7 +2,7 @@
 # Compile mSPACES, signe et installe dans ~/Applications/Applications Personnelles.
 set -euo pipefail
 cd "$(dirname "$0")"
-VERSION="${1:-1.0.0}"
+VERSION="${1:-1.0.1}"
 swift build -c release
 APP="build/mSPACES.app"
 rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
