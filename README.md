@@ -12,6 +12,8 @@ Separators for your macOS menu bar, so related items sit together in groups.
 
 mSPACES is made by Starbudweiser & Claude Code (Anthropic). MIT License, © 2026 Starbudweiser. Provided as is, without warranty of any kind.
 
+mSPACES is part of the **DESKTOP MAC TOOLKIT**, Starbudweiser's collection of macOS apps.
+
 mSPACES adds separators to your macOS menu bar so related items sit together in groups. Click a separator and choose "New Separator" to add another one; hold Command and drag a separator to move it. Each separator can be a space, a tab, a dot, a bar or a dash. Available in English, French, Spanish and Italian, with automatic updates from GitHub releases.
 
 ## Features
