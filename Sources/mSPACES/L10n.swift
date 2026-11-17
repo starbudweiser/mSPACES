@@ -3,6 +3,7 @@ import Foundation
 /// Textes de l'interface : français (rédigé en premier), anglais, espagnol, italien. Anglais si la langue système n'en fait pas partie.
 private let strings: [String: [String: String]] = [
     "fr": [
+        "collapse": "Réduire les icônes à gauche", "expand": "Afficher les icônes à gauche",
         "upd.check": "Rechercher une mise à jour…",
         "upd.auto": "Installer automatiquement les mises à jour",
         "upd.available": "Version %@ disponible. L'installer maintenant ?",
@@ -20,6 +21,7 @@ private let strings: [String: [String: String]] = [
         "about.collection": "Fait partie du DESKTOP MAC TOOLKIT",
     ],
     "en": [
+        "collapse": "Collapse Icons to the Left", "expand": "Show Icons to the Left",
         "upd.check": "Check for Updates…",
         "upd.auto": "Install Updates Automatically",
         "upd.available": "Version %@ is available. Install it now?",
@@ -37,6 +39,7 @@ private let strings: [String: [String: String]] = [
         "about.collection": "Part of the DESKTOP MAC TOOLKIT",
     ],
     "es": [
+        "collapse": "Ocultar iconos a la izquierda", "expand": "Mostrar iconos a la izquierda",
         "upd.check": "Buscar actualizaciones…",
         "upd.auto": "Instalar actualizaciones automáticamente",
         "upd.available": "La versión %@ está disponible. ¿Instalarla ahora?",
@@ -54,6 +57,7 @@ private let strings: [String: [String: String]] = [
         "about.collection": "Forma parte del DESKTOP MAC TOOLKIT",
     ],
     "it": [
+        "collapse": "Nascondi icone a sinistra", "expand": "Mostra icone a sinistra",
         "upd.check": "Cerca aggiornamenti…",
         "upd.auto": "Installa automaticamente gli aggiornamenti",
         "upd.available": "La versione %@ è disponibile. Installarla ora?",

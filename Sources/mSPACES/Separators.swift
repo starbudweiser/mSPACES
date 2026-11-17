@@ -1,6 +1,19 @@
 import AppKit
 import ServiceManagement
 
+extension SepStyle {
+    static func collapsedImage(width: CGFloat) -> NSImage {
+        let img = NSImage(size: NSSize(width: width, height: 18), flipped: false) { r in
+            let t = NSAttributedString(string: "‹", attributes: [.font: NSFont.systemFont(ofSize: 16, weight: .semibold), .foregroundColor: NSColor.black])
+            let ts = t.size()
+            t.draw(at: NSPoint(x: r.maxX - 6 - ts.width / 2, y: r.midY - ts.height / 2))
+            return true
+        }
+        img.isTemplate = true
+        return img
+    }
+}
+
 enum SepStyle: String, CaseIterable {
     case space, tab, dot, bar, dash, long
 
@@ -36,6 +49,10 @@ final class SeparatorManager: NSObject {
         get { defaults.array(forKey: "ids") as? [Int] ?? [] }
         set { defaults.set(newValue, forKey: "ids") }
     }
+    /// Réduit : le séparateur s'allonge, macOS masque les icônes qui ne tiennent plus à sa gauche (trop long, il disparaît lui-même).
+    private var collapsedLength: CGFloat { ((NSScreen.main?.frame.width ?? 1440) * 0.45).rounded() }
+    private func isCollapsed(_ id: Int) -> Bool { defaults.bool(forKey: "collapsed.\(id)") }
+    private func posKey(_ name: String) -> String { "NSStatusItem Preferred Position \(name)" }
     private func style(_ id: Int) -> SepStyle { SepStyle(rawValue: defaults.string(forKey: "style.\(id)") ?? "") ?? .bar }
 
     func start() {
@@ -49,16 +66,30 @@ final class SeparatorManager: NSObject {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.autosaveName = "mSPACES.sep.\(id)"
         item.isVisible = true
+        item.button?.identifier = NSUserInterfaceItemIdentifier("\(id)")
+        item.button?.target = self
+        item.button?.action = #selector(clicked(_:))
+        item.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
         return item
     }
 
     private func refresh() {
         for (id, item) in items {
-            item.length = style(id).width
-            item.button?.image = style(id).image
+            let collapsed = isCollapsed(id)
+            item.length = collapsed ? collapsedLength : style(id).width
+            item.button?.image = collapsed ? SepStyle.collapsedImage(width: collapsedLength) : style(id).image
+            item.button?.imagePosition = .imageOnly
+            (item.button?.cell as? NSButtonCell)?.imageScaling = .scaleNone
             item.button?.toolTip = L("hint")
-            item.menu = buildMenu(id)
         }
+    }
+
+    /// Menu ouvert à la main sous l'icône (jamais statusItem.menu : mal placé sur plusieurs écrans).
+    @objc private func clicked(_ sender: NSStatusBarButton) {
+        guard let id = Int(sender.identifier?.rawValue ?? "") else { return }
+        let menu = buildMenu(id)
+        let x: CGFloat = isCollapsed(id) ? 0 : 0
+        menu.popUp(positioning: nil, at: NSPoint(x: x, y: sender.isFlipped ? sender.bounds.maxY + 4 : -4), in: sender)
     }
 
     private func buildMenu(_ id: Int) -> NSMenu {
@@ -69,6 +100,7 @@ final class SeparatorManager: NSObject {
             m.addItem(mi)
         }
         add(L("new"), #selector(newSeparator), to: menu)
+        add(isCollapsed(id) ? L("expand") : L("collapse"), #selector(toggleCollapse(_:)), tag: id, to: menu)
         add(L("remove"), ids.count > 1 ? #selector(removeSeparator(_:)) : #selector(noop), tag: id, to: menu)
         menu.addItem(.separator())
         if #available(macOS 14.0, *) {
@@ -91,6 +123,11 @@ final class SeparatorManager: NSObject {
 
     @objc private func noop() {}
 
+    @objc private func toggleCollapse(_ sender: NSMenuItem) {
+        defaults.set(!isCollapsed(sender.tag), forKey: "collapsed.\(sender.tag)")
+        refresh()
+    }
+
     @objc private func newSeparator() {
         let id = defaults.integer(forKey: "nextId")
         defaults.set(id + 1, forKey: "nextId")
@@ -103,7 +140,8 @@ final class SeparatorManager: NSObject {
         let id = sender.tag
         guard ids.count > 1, let item = items.removeValue(forKey: id) else { return }
         NSStatusBar.system.removeStatusItem(item)
-        defaults.removeObject(forKey: "NSStatusItem Preferred Position mSPACES.sep.\(id)")
+        defaults.removeObject(forKey: posKey("mSPACES.sep.\(id)"))
+        defaults.removeObject(forKey: "collapsed.\(id)")
         ids.removeAll { $0 == id }
         refresh()
     }

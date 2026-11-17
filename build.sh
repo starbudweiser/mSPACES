@@ -2,9 +2,12 @@
 # Compile mSPACES, signe et installe dans ~/Applications/Applications Personnelles.
 set -euo pipefail
 cd "$(dirname "$0")"
+DEV=0; [ "${1:-}" = dev ] && { DEV=1; shift; }
 VERSION="${1:-1.0.1}"
+BID="com.starbudweiser.mspaces"; ANAME="mSPACES"
+[ $DEV = 1 ] && { BID="$BID.dev"; ANAME="mSPACES-dev"; }
 swift build -c release
-APP="build/mSPACES.app"
+APP="build/$ANAME.app"
 rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/mSPACES "$APP/Contents/MacOS/"
 # Icône
@@ -21,7 +24,7 @@ cat > "$APP/Contents/Info.plist" <<PL
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
 <key>CFBundleExecutable</key><string>mSPACES</string>
-<key>CFBundleIdentifier</key><string>com.starbudweiser.mspaces</string>
+<key>CFBundleIdentifier</key><string>$BID</string>
 <key>CFBundleName</key><string>mSPACES</string>
 <key>CFBundleIconFile</key><string>mSPACES</string>
 <key>CFBundlePackageType</key><string>APPL</string>
@@ -32,6 +35,8 @@ cat > "$APP/Contents/Info.plist" <<PL
 </dict></plist>
 PL
 /Volumes/SKYRIM/TOOLS/MAC/_tools/sign_app.sh "$APP" "$VERSION"
+[ $DEV = 1 ] && { echo "Dev : $APP"; exit 0; }
+[ $DEV = 1 ] && { echo "Dev : $APP"; exit 0; }
 DEST="$HOME/Applications/Applications Personnelles"; mkdir -p "$DEST"
 rm -rf "$DEST/mSPACES.app"; cp -R "$APP" "$DEST/"
 echo "Installé : $DEST/mSPACES.app"
