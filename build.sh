@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 DEV=0; [ "${1:-}" = dev ] && { DEV=1; shift; }
-VERSION="${1:-1.0.1}"
+VERSION="${1:-1.0.2}"
 BID="com.starbudweiser.mspaces"; ANAME="mSPACES"
 [ $DEV = 1 ] && { BID="$BID.dev"; ANAME="mSPACES-dev"; }
 swift build -c release
