@@ -44,13 +44,13 @@ final class SeparatorManager: NSObject {
     private let defaults = UserDefaults.standard
     private var items: [Int: NSStatusItem] = [:]
     private let updater = Updater()
+    private var rightEdge: [Int: CGFloat] = [:]
+    private var collapsedApplied: Set<Int> = []
 
     private var ids: [Int] {
         get { defaults.array(forKey: "ids") as? [Int] ?? [] }
         set { defaults.set(newValue, forKey: "ids") }
     }
-    /// Réduit : le séparateur s'allonge, macOS masque les icônes qui ne tiennent plus à sa gauche (trop long, il disparaît lui-même).
-    private var collapsedLength: CGFloat { ((NSScreen.main?.frame.width ?? 1440) * 0.45).rounded() }
     private func isCollapsed(_ id: Int) -> Bool { defaults.bool(forKey: "collapsed.\(id)") }
     private func posKey(_ name: String) -> String { "NSStatusItem Preferred Position \(name)" }
     private func style(_ id: Int) -> SepStyle { SepStyle(rawValue: defaults.string(forKey: "style.\(id)") ?? "") ?? .bar }
@@ -59,11 +59,13 @@ final class SeparatorManager: NSObject {
         if ids.isEmpty { ids = [1]; defaults.set(2, forKey: "nextId") }
         for id in ids { items[id] = makeItem(id) }
         refresh()
+        // Les fenêtres des éléments ne sont placées qu'un instant plus tard : on mesure alors les séparateurs réduits.
+        Task { @MainActor in try? await Task.sleep(nanoseconds: 800_000_000); self.refresh() }
         updater.start()
     }
 
-    private func makeItem(_ id: Int) -> NSStatusItem {
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    private func makeItem(_ id: Int, length: CGFloat = NSStatusItem.variableLength) -> NSStatusItem {
+        let item = NSStatusBar.system.statusItem(withLength: length)
         item.autosaveName = "mSPACES.sep.\(id)"
         item.isVisible = true
         item.button?.identifier = NSUserInterfaceItemIdentifier("\(id)")
@@ -74,14 +76,40 @@ final class SeparatorManager: NSObject {
     }
 
     private func refresh() {
-        for (id, item) in items {
-            let collapsed = isCollapsed(id)
-            item.length = collapsed ? collapsedLength : style(id).width
-            item.button?.image = collapsed ? SepStyle.collapsedImage(width: collapsedLength) : style(id).image
+        for id in items.keys {
+            items[id]?.button?.toolTip = L("hint")
+            if isCollapsed(id) { applyCollapse(id); continue }
+            if collapsedApplied.remove(id) != nil { recreate(id, length: style(id).width) }  // sortie du mode réduit
+            rightEdge[id] = nil
+            guard let item = items[id] else { continue }
+            item.length = style(id).width
+            item.button?.image = style(id).image
             item.button?.imagePosition = .imageOnly
-            (item.button?.cell as? NSButtonCell)?.imageScaling = .scaleNone
-            item.button?.toolTip = L("hint")
         }
+    }
+
+    /// Recrée l'élément directement à sa longueur : un élément déjà en place, allongé après coup, est écarté lui-même
+    /// par macOS au lieu de masquer les icônes à sa gauche.
+    private func recreate(_ id: Int, length: CGFloat) {
+        if let old = items[id] { NSStatusBar.system.removeStatusItem(old) }
+        items[id] = makeItem(id, length: length)
+        items[id]?.button?.toolTip = L("hint")
+    }
+
+    /// Réduit : le séparateur s'étend vers la gauche (macOS masque alors les icônes qui n'ont plus de place), mais pas plus
+    /// loin qu'environ 40 % de la largeur de l'écran à partir de la gauche : au-delà, macOS l'écarte lui-même.
+    private func applyCollapse(_ id: Int) {
+        guard let item = items[id], !collapsedApplied.contains(id) else { return }
+        if rightEdge[id] == nil {
+            guard let w = item.button?.window, w.frame.minX > 50, w.frame.width < 200 else { return }  // pas encore en place
+            rightEdge[id] = w.frame.maxX
+        }
+        let screenWidth = NSScreen.main?.frame.width ?? 1440
+        let length = max(style(id).width, rightEdge[id]! - screenWidth * 0.40)
+        collapsedApplied.insert(id)
+        recreate(id, length: length)
+        items[id]?.button?.image = SepStyle.collapsedImage(width: length)
+        items[id]?.button?.imagePosition = .imageOnly
     }
 
     /// Menu ouvert à la main sous l'icône (jamais statusItem.menu : mal placé sur plusieurs écrans).
@@ -162,3 +190,4 @@ final class SeparatorManager: NSObject {
     @objc private func showAbout() { About.show() }
     @objc private func quit() { NSApp.terminate(nil) }
 }
+
