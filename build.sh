@@ -32,6 +32,8 @@ cat > "$APP/Contents/Info.plist" <<PL
 <key>CFBundleVersion</key><string>1</string>
 <key>LSMinimumSystemVersion</key><string>13.0</string>
 <key>LSUIElement</key><true/>
+<key>CFBundleDevelopmentRegion</key><string>en</string>
+<key>CFBundleLocalizations</key><array><string>fr</string><string>en</string><string>es</string><string>it</string></array>
 </dict></plist>
 PL
 /Volumes/SKYRIM/TOOLS/MAC/_tools/sign_app.sh "$APP" "$VERSION"

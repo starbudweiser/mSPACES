@@ -73,8 +73,12 @@ private let strings: [String: [String: String]] = [
 ]
 
 private let lang: String = {
-    let code = Locale.preferredLanguages.first.map { String($0.prefix(2)) } ?? "en"
-    return strings[code] != nil ? code : "en"
+    // Première langue préférée du système prise en charge, anglais sinon.
+    for id in Locale.preferredLanguages {
+        let code = String(id.prefix(2)).lowercased()
+        if strings[code] != nil { return code }
+    }
+    return "en"
 }()
 
 func L(_ key: String, _ args: CVarArg...) -> String {
