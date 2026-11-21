@@ -58,3 +58,9 @@ mSPACES ajoute des séparateurs à la barre de menus de macOS pour regrouper les
 Installation : téléchargez la [dernière version notarisée](https://github.com/starbudweiser/mSPACES/releases/latest), décompressez-la et placez **mSPACES.app** dans Applications (macOS 13 Ventura ou plus récent).
 
 Interface en français, anglais, espagnol et italien, choisie d'après la langue du Mac (anglais sinon). Licence MIT, © 2026 Starbudweiser. Questions et bugs : [Issues GitHub](https://github.com/starbudweiser/mSPACES/issues).
+
+## Support / Soutenir
+
+This app is free. If it is useful to you, you can support the project (optional, no reward expected): [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
+
+Cette appli est gratuite. Si elle vous est utile, vous pouvez soutenir le projet (facultatif, sans contrepartie) : [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
